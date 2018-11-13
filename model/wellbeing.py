@@ -1,36 +1,31 @@
 import pystan
 import numpy as np
 import pickle
+import pandas as pd
 
 stan_code = """
 data {
-    int<lower=0> N;  // number of data points
-    vector[N] x;
-    vector[N] y;
-    real x_pred;
-    real tau;
+    int<lower=0> N;
+    nchildless[N];
+    nfamilies[N];
 }
 parameters {
-    real alpha;
-    real beta;
-    real sigma;
-    real y_pred;
+    vector[N] wellbeing;
+    real beta_childless;
+    real baseline_childless;
 }
 transformed parameters {
-    vector[N] mu_y_mean;
-    real mu_y_pred;
-    mu_y_mean = alpha + beta*x;
-    mu_y_pred = alpha + beta*x_pred;
 }
 model {
-    beta ~ normal(0, tau);
-    y ~ normal(mu_y_mean, sigma);
-    y_pred ~ normal(mu_y_pred, sigma);
+    nchildless ~ poisson_log(beta_childless*wellbeing + baseline_childless + nfamilies);
 }
 
 """
-drowning_data = np.loadtxt('drowning.txt')
-N = drowning_data.shape[0]
+paavo_df = pd.read_csv('data/paavo_9_koko.csv', sep=';')
+#paavo_df['nchildless'] = paavo_df['Young single persons, 2016 (TE)'].astype(int) + paavo_df['Young couples without children, 2016 (TE)'].astype(int)
+print(paavo_df['Young single persons, 2016 (TE)'][:99])
+'''
+N = paavo_df.shape[0]
 x = drowning_data[:,0]
 y = drowning_data[:,1]
 x_pred = 2019
@@ -45,3 +40,4 @@ posterior_samples = [extracts[param] for param in ['alpha', 'beta', 'mu_y_mean',
 
 with open('posterior_samples.pkl', 'wb') as f:
     pickle.dump(posterior_samples, f)
+'''
