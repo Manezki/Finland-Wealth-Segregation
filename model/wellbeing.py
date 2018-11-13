@@ -22,8 +22,13 @@ model {
 
 """
 paavo_df = pd.read_csv('data/paavo_9_koko.csv', sep=';')
-#paavo_df['nchildless'] = paavo_df['Young single persons, 2016 (TE)'].astype(int) + paavo_df['Young couples without children, 2016 (TE)'].astype(int)
-print(paavo_df['Young single persons, 2016 (TE)'][:99])
+
+paavo_sub = paavo_df[paavo_df['Young single persons, 2016 (TE)'] != "."] # Exclude empty observations
+paavo_sub = paavo_sub[paavo_sub['Young couples without children, 2016 (TE)'] != "."]
+# TODO paavo_sub still contains ".." observations.
+
+#paavo_sub['nchildless'] = paavo_sub['Young single persons, 2016 (TE)'].astype(int) + paavo_sub['Young couples without children, 2016 (TE)'].astype(int)
+print(paavo_sub['nchildless'][:20])
 '''
 N = paavo_df.shape[0]
 x = drowning_data[:,0]
