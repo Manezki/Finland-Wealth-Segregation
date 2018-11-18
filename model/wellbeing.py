@@ -11,8 +11,8 @@ data {
 }
 parameters {
     real wellbeing_a;
-    real wellbeing_b;
-    vector[N] wellbeing;
+    real<lower=0> wellbeing_b;
+    vector<lower=0>[N] wellbeing;
     real beta_childless;
     real baseline_childless;
 }
@@ -41,8 +41,8 @@ paavo_sub = paavo_sub.iloc[1:, :]
 
 # Include nchildless
 paavo_sub['nchildless_young'] = paavo_sub['Young single persons, 2016 (TE)'].astype(int) + paavo_sub['Young couples without children, 2016 (TE)'].astype(int)
-paavo_sub['nchildless'] = paavo_sub['Adult households, 2016 (TE)'].astype(int) + paavo_sub['Pensioner households, 2016 (TE)'].astype(int)
-paavo_sub["nfamilies"] = paavo_sub["Households with children, 2016 (TE)"].astype(int)
+paavo_sub['nfamilies'] = paavo_sub['Adult households, 2016 (TE)'].astype(int) + paavo_sub['Pensioner households, 2016 (TE)'].astype(int)
+paavo_sub["nchildless"] = paavo_sub['nfamilies'] - paavo_sub["Households with children, 2016 (TE)"].astype(int)
 
 # IF one wants to work only with capital area.
 # Contains Helsinki, Vantaa, Espoo + Some neighbours
