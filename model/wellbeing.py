@@ -10,7 +10,9 @@ data {
     vector<lower=0>[N] nfamilies;
 }
 parameters {
-    vector[N] wellbeing;
+    real wellbeing_a;
+    real<lower=0> wellbeing_b;
+    vector<lower=0>[N] wellbeing;
     real beta_childless;
     real baseline_childless;
 }
@@ -18,9 +20,12 @@ transformed parameters {
 
 }
 model {
+    // Sinkkonen original
     // nchildless ~ poisson_log(beta_childless*wellbeing + baseline_childless + nfamilies);
-    // Changed data to logscale.
-    nchildless ~ poisson_log(beta_childless*wellbeing + log(baseline_childless) + log(nfamilies));
+
+    // Heavier tails than normal
+    wellbeing ~ cauchy(wellbeing_a, wellbeing_b);
+    nchildless ~ poisson(beta_childless*wellbeing + baseline_childless + nfamilies);
 }
 
 """
@@ -36,12 +41,18 @@ paavo_sub = paavo_sub.iloc[1:, :]
 
 # Include nchildless
 paavo_sub['nchildless_young'] = paavo_sub['Young single persons, 2016 (TE)'].astype(int) + paavo_sub['Young couples without children, 2016 (TE)'].astype(int)
-paavo_sub['nchildless'] = paavo_sub['Adult households, 2016 (TE)'].astype(int) + paavo_sub['Pensioner households, 2016 (TE)'].astype(int)
-paavo_sub["nfamilies"] = paavo_sub["Households with children, 2016 (TE)"].astype(int)
+paavo_sub['nfamilies'] = paavo_sub['Adult households, 2016 (TE)'].astype(int) + paavo_sub['Pensioner households, 2016 (TE)'].astype(int)
+paavo_sub["nchildless"] = paavo_sub['nfamilies'] - paavo_sub["Households with children, 2016 (TE)"].astype(int)
 
 # IF one wants to work only with capital area.
 # Contains Helsinki, Vantaa, Espoo + Some neighbours
-paavo_sub = paavo_sub.loc[paavo_sub["Postal code area"].apply(lambda x: x[:2] in ["00", "01", "02"])]
+#paavo_sub = paavo_sub.loc[paavo_sub["Postal code area"].apply(lambda x: x[:2] in ["00", "01", "02"])]
+
+# Use even smaller area in order to have lower R-hats
+paavo_sub = paavo_sub.loc[paavo_sub["Postal code area"].apply(lambda x: x[:2] in ["00"])]
+paavo_sub = paavo_sub.iloc[:8,:]
+print(paavo_sub)
+
 
 data = dict(
     N=paavo_sub.shape[0],
