@@ -44,6 +44,13 @@ paavo_sub['nchildless_young'] = paavo_sub['Young single persons, 2016 (TE)'].ast
 paavo_sub['nfamilies'] = paavo_sub['Adult households, 2016 (TE)'].astype(int) + paavo_sub['Pensioner households, 2016 (TE)'].astype(int)
 paavo_sub["nchildless"] = paavo_sub['nfamilies'] - paavo_sub["Households with children, 2016 (TE)"].astype(int)
 
+# Normalize by surface area (sqr kilometer)
+paavo_sub['nfamilies'] = paavo_sub['nfamilies'] // (paavo_sub['Surface area'].astype(int) / 10000 )
+paavo_sub["nchildless"] = paavo_sub["nchildless"] // (paavo_sub['Surface area'].astype(int) / 10000 )
+paavo_sub['nfamilies'] = paavo_sub['nfamilies'].astype(int)
+paavo_sub['nchildless'] = paavo_sub['nchildless'].astype(int)
+
+
 # IF one wants to work only with capital area.
 # Contains Helsinki, Vantaa, Espoo + Some neighbours
 #paavo_sub = paavo_sub.loc[paavo_sub["Postal code area"].apply(lambda x: x[:2] in ["00", "01", "02"])]
