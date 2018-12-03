@@ -13,8 +13,8 @@ transformed data {
 }
 parameters {
     vector[n_postal_regions] logit_p_regional;
-    real<lower=0> n_national_sigma;
-    real<lower=0, upper=1> n_national_mu;
+    real<lower=0> national_sigma;
+    real<lower=0, upper=1> national_mu;
 }
 transformed parameters {
     vector<lower=0, upper=1>[n_postal_regions] p_regional;
