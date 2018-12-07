@@ -1,0 +1,3 @@
+[submodule "PSIS"]
+	path = PSIS
+	url = https://github.com/avehtari/PSIS.git
