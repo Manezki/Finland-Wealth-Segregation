@@ -45,5 +45,5 @@ print(fit)
 extracts = fit.extract(permuted=True)
 posterior_samples = [extracts[param] for param in ['mu_national', 'mu_regional', 'sigma_national', 'sigma_regional', 'log_lik']]
 
-with open('wellbeing1_hierarchical.pkl', 'wb') as f:
+with open('wellbeing_hierarchical_gaussian.pkl', 'wb') as f:
     pickle.dump(posterior_samples, f)
