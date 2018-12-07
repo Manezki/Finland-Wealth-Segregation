@@ -8,8 +8,10 @@ data {
 transformed data {
     int<lower=0> n_national_households;
     int<lower=0> n_national_affluent;
+    int<lower=0> n_national_nonaffluent;
     n_national_households = sum(n_households);
     n_national_affluent = sum(n_affluent_households);
+    n_national_nonaffluent = n_national_households - n_national_affluent;
 }
 parameters {
     vector[n_postal_regions] logit_p_regional;
@@ -24,7 +26,7 @@ transformed parameters {
     p_regional = inv_logit(logit_p_regional);
 }
 model {
-    national_mu ~ beta(n_national_affluent, n_national_households);
+    national_mu ~ beta(n_national_affluent, n_national_nonaffluent);
     logit_p_regional ~ normal(national_mu, national_sigma);
     for (i in 1:n_postal_codes) {
           n_affluent_households[i] ~ binomial(n_households[i], p_regional[postal_region_ix[i]]);
