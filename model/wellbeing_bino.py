@@ -36,7 +36,7 @@ data = dict(
     postal_region_ix=postal_region_ix)
 
 model = pystan.StanModel(file=op.join(op.dirname(__file__),"single_param_bino.stan"))
-fit = model.sampling(data=data, iter=1000, chains=2)
+fit = model.sampling(data=data, iter=5000, chains=2)
 extracts = fit.extract(permuted=True)
 
 posterior_samples = [extracts[param] for param in ['p_regional', 'log_lik', 'national_sigma', 'national_mu']]
