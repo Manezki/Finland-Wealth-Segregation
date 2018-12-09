@@ -26,7 +26,9 @@ transformed parameters {
     p_regional = inv_logit(logit_p_regional);
 }
 model {
-    national_mu ~ beta(n_national_affluent, n_national_nonaffluent);
+    national_mu ~ beta(6, 15);
+    // Using logit-normal distribution, but Stan requires us to do the logit part in the transformed
+    // parameters part
     logit_p_regional ~ normal(national_mu, national_sigma);
     for (i in 1:n_postal_codes) {
           n_affluent_households[i] ~ binomial(n_households[i], p_regional[postal_region_ix[i]]);
