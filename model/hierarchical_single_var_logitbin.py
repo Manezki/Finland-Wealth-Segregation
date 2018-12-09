@@ -7,7 +7,7 @@ stan_code = """
 data {
     int<lower=0> n_postal_codes; // number of postal code data points
     int <lower=0> n_postal_regions; // number of two-digit areas (groups)
-    int<lower=1,upper=n_postal_regions> postal_region_ix[n_postal_codes]; // group indicator
+    int<lower=0,upper=n_postal_regions> postal_region_ix[n_postal_codes]; // group indicator
     int n_affluent[n_postal_codes]; // observations
     int n_households[n_postal_codes]; // total number of households per postal code
 }
@@ -29,7 +29,7 @@ model {
 generated quantities {
     vector[n_postal_codes] log_lik;
     for (i in 1:n_postal_codes)
-        log_lik[i] = normal_lpdf(eta[i]| mu_regional[postal_region_ix[i]], sigma_regional);
+        log_lik[i] = binomial_logit_lpmf(n_affluent[i] | n_households[i], eta[i]);
 }
 """
 with open('paavodata_cleaned_df.pkl', 'rb') as f:
@@ -50,7 +50,7 @@ data = dict(
         n_affluent=n_affluent_households.values.astype(int),
         n_households=n_households_total.values.astype(int))
 model = pystan.StanModel(model_code=stan_code)
-fit = model.sampling(data=data, iter=6000, chains=4)
+fit = model.sampling(data=data, iter=5000, chains=2)
 print(fit)
 extracts = fit.extract(permuted=True)
 posterior_samples = [extracts[param] for param in ['mu_national', 'mu_regional', 'sigma_national', 'sigma_regional', 'eta', 'log_lik']]
