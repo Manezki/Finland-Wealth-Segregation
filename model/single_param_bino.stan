@@ -35,6 +35,6 @@ model {
 generated quantities {
     vector[n_postal_codes] log_lik;
     for (i in 1:n_postal_codes) {
-        log_lik[i] = binomial_log(n_affluent_households[i], n_households[i], p_regional[postal_region_ix[i]]);
+        log_lik[i] = binomial_lpmf(n_affluent_households[i] | n_households[i], p_regional[postal_region_ix[i]]);
     }
 }
