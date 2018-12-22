@@ -2,6 +2,7 @@ import pystan
 import numpy as np
 import pickle
 import pandas as pd
+from os import path as op
 
 
 with open('paavodata_cleaned_df.pkl', 'rb') as f:
