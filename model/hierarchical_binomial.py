@@ -4,8 +4,12 @@ import pickle
 import pandas as pd
 from os import path as op
 
-with open('paavodata_cleaned_df.pkl', 'rb') as f:
-    paavo_df = pickle.load(f)
+try:
+    with open(op.join(op.dirname(__file__), '..', 'paavodata_cleaned_df.pkl'), 'rb') as f:    
+        paavo_df = pickle.load(f)
+except FileNotFoundError:
+    from data_wrangling import aggregate_paavo
+    paavo_df = aggregate_paavo()
 
 # Areas with no households?
 paavo_df = paavo_df.loc[~paavo_df["n_households_2015"].isna()]

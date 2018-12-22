@@ -4,9 +4,12 @@ import pickle
 import pandas as pd
 from os import path as op
 
-
-with open('paavodata_cleaned_df.pkl', 'rb') as f:
-    paavo_df = pickle.load(f)
+try:
+    with open(op.join(op.dirname(__file__), '..', 'paavodata_cleaned_df.pkl'), 'rb') as f:    
+        paavo_df = pickle.load(f)
+except FileNotFoundError:
+    from data_wrangling import aggregate_paavo
+    paavo_df = aggregate_paavo()
 
 n_affluent_households = paavo_df['n_households_highest_income_2015']
 n_households_total = paavo_df['n_households_2015']

@@ -5,8 +5,12 @@ import pandas as pd
 from os import path as op
 
 
-with open('paavodata_cleaned_df.pkl', 'rb') as f:
-    paavo_df = pickle.load(f)
+try:
+    with open(op.join(op.dirname(__file__), '..', 'paavodata_cleaned_df.pkl'), 'rb') as f:    
+        paavo_df = pickle.load(f)
+except FileNotFoundError:
+    from data_wrangling import aggregate_paavo
+    paavo_df = aggregate_paavo()
 
 n_postal_regions = paavo_df['postal_region'].nunique()
 n_postal_codes = paavo_df.shape[0]
