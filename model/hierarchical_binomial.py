@@ -45,8 +45,8 @@ extracts = fit.extract(permuted=True)
 
 posterior_samples = [extracts[param] for param in ['p_regional', 'log_lik', 'national_sigma', 'national_mu']]
 
-with open('wellbeing_hierarchical_binomial_fit.txt', "w+") as f:
+with open('affluent_hierarchical_binomial_fit.txt', "w+") as f:
     f.write(str(fit))
 
-with open('wellbeing_hierarchical_binomial.pkl', 'wb') as f:
+with open('affluent_hierarchical_binomial.pkl', 'wb') as f:
     pickle.dump(posterior_samples, f)
