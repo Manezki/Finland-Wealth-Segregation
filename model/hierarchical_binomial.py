@@ -35,7 +35,7 @@ data = dict(
     n_households=n_households_total,
     postal_region_ix=postal_region_ix)
 
-model = pystan.StanModel(file=op.join(op.dirname(__file__),"single_param_bino.stan"))
+model = pystan.StanModel(file=op.join(op.dirname(__file__), "single_param_bino.stan"))
 fit = model.sampling(data=data, iter=1000, chains=2)
 extracts = fit.extract(permuted=True)
 
