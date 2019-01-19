@@ -2,38 +2,14 @@ import pystan
 import numpy as np
 import pickle
 import pandas as pd
+from os import path as op
 
-stan_code = """
-data {
-    int<lower=0> n_postal_codes; // number of postal code data points
-    int <lower=0> n_postal_regions; // number of two-digit areas (groups)
-    int<lower=1,upper=n_postal_regions> postal_region_ix[n_postal_codes]; // group indicator
-    int n_affluent[n_postal_codes]; // observations
-    int n_households[n_postal_codes]; // total number of households per postal code
-}
-parameters {
-  real mu_national;        // hyperprior mean
-  real<lower=0> sigma_national;        // hyperprior std
-  vector[n_postal_regions] mu_regional;        // group means
-  vector<lower=0>[n_postal_regions] sigma_regional;        // group std
-  vector[n_postal_codes] eta; // logit proportion for reparametrized binomial
-}
-model {
-  mu_national ~ normal(-1, 2);
-  sigma_national ~ normal(0, 3);
-  sigma_regional ~ normal(0, 3);
-  mu_regional ~ normal(mu_national, sigma_national);
-  eta ~ normal(mu_regional[postal_region_ix], sigma_regional[postal_region_ix]);
-  n_affluent ~ binomial_logit(n_households, eta);
-}
-generated quantities {
-    vector[n_postal_codes] log_lik;
-    for (i in 1:n_postal_codes)
-        log_lik[i] = binomial_logit_lpmf(n_affluent[i] | n_households[i], eta[i]);
-}
-"""
-with open('paavodata_cleaned_df.pkl', 'rb') as f:
-    paavo_df = pickle.load(f)
+try:
+    with open(op.join(op.dirname(__file__), '..', 'paavodata_cleaned_df.pkl'), 'rb') as f:    
+        paavo_df = pickle.load(f)
+except FileNotFoundError:
+    from data_wrangling import aggregate_paavo
+    paavo_df = aggregate_paavo()
 
 n_affluent_households = paavo_df['n_households_highest_income_2015']
 n_households_total = paavo_df['n_households_2015']
@@ -50,7 +26,7 @@ data = dict(
         postal_region_ix=postal_region_ix.values,
         n_affluent=n_affluent_households.values.astype(int),
         n_households=n_households_total.values.astype(int))
-model = pystan.StanModel(model_code=stan_code)
+model = pystan.StanModel(file=op.join(op.dirname(__file__), "hierarchical_single_vat_logitbin.stan"))
 fit = model.sampling(data=data, iter=5000, chains=2)
 print(fit)
 extracts = fit.extract(permuted=True)
